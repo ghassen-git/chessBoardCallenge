@@ -18,7 +18,7 @@ void calculateMiniMoves()
  Console.WriteLine(bfs(destination,Shorten_path(destination)));
 
 utilities.constructPath(destination);
-utilities.checkForExistingFile();
+
 }
 
 int bfs( Square destination ,Square start)

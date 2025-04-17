@@ -4,9 +4,10 @@ namespace challenge_1_Csharp;
 
 public class utilities
 {
-    private static StringBuilder sb = new StringBuilder();
-    private static string directory = @"../../../../chessBorard_Preview";
-    private static string pathname="chessboard.txt";
+    private static string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+        , "ChessboardData");
+    private static string pathname="chessboard.txt";   
+    static string  path = Path.Combine(directory, pathname);
 private static List<Square> points = new List<Square>();
     internal static void addTOPath(Square point)
     {
@@ -14,14 +15,37 @@ private static List<Square> points = new List<Square>();
         
     }
  
-    internal static void checkForExistingFile()
+
+
+    internal static void constructPath(Square destination)
     {
-        string path = directory +"/"+ pathname;
+        points.Reverse();
+        string[,] board = new String [ destination.x + 3, destination.y + 3];
+        for (int i = destination.y + 2; 0 <= i; i--)
+        {
+            for (int j = 0; j <= destination.x + 2; j++)
+            {
+                board[i, j] = ".";
+            }
+        }
+
+        foreach (var point in points)
+        {
+            board[point.x, point.y] = point.pathlen.ToString();
+        }
+       
         bool exists = File.Exists(path);
         if (exists)
         {
-  File.Delete(path);  
-  File.WriteAllText(path,sb.ToString());
+           File.WriteAllText(path,"");
+            for (int i = destination.y + 2; 0 <= i; i--)
+            {
+                for (int j = 0; j <= destination.x + 2; j++)
+                {
+                    File.AppendAllText(path,board[i,j]);
+                }
+                File.AppendAllText(path,"\n");
+            }
         }
         else
         {
@@ -30,35 +54,17 @@ private static List<Square> points = new List<Square>();
                 Directory.CreateDirectory(directory);
                 Console.WriteLine("Created directory!");
             }
-            File.WriteAllText(path,sb.ToString());
-        }
-    }
-
-    internal static void constructPath(Square destination)
-    {
-        points.Reverse();
-        
-        for (int i = destination.y+2; 0 <=i ; i--)
-        {
-            for (int j =0 ; j <=destination.x+2 ; j++)
+            for (int i = destination.y + 2; 0 <= i; i--)
             {
-                    sb.Append(" .");
-                foreach (var point in points)
+                for (int j = 0; j <= destination.x + 2; j++)
                 {
-                    if (i==point.y && j==point.x)
-                    {
-                        sb.Remove(sb.Length - 1, 1);
-                        sb.Append(point.pathlen>9 ? point.pathlen.ToString() : "0" + point.pathlen.ToString());
-                        break;
-                    }
-                   
+                    File.AppendAllText(path,board[i,j]);
                 }
-                
-                
+                File.AppendAllText(path,"\n");
             }
-            sb.AppendLine();
             
         }
-       
+        
     }
+    
 }
