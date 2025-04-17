@@ -1,8 +1,9 @@
 ﻿using challenge_1_Csharp;
-var path = new Dictionary<string,string>();
-HashSet<string> visited = new HashSet<string>();
-path.Add("(0,0)","");
 
+var path = new Dictionary<Square,Square>();
+HashSet<string> visited = new HashSet<string>();
+path.Add(new Square(0,0,0),null);
+visited.Add("(0,0)");
 void calculateMiniMoves()
 {
 
@@ -15,6 +16,9 @@ void calculateMiniMoves()
   
 
  Console.WriteLine(bfs(destination,Shorten_path(destination)));
+
+utilities.constructPath(destination);
+utilities.checkForExistingFile();
 }
 
 int bfs( Square destination ,Square start)
@@ -33,10 +37,10 @@ int bfs( Square destination ,Square start)
     
     int size = movesQueue.Count;
   
-     Square current = movesQueue.Dequeue();
+     var current = movesQueue.Dequeue();
      if (current.x == destination.x && current.y == destination.y)
      {
-      reconstructPath($"({current.x},{current.y})");
+      reconstructPath(current);
       return current.pathlen;
      }
 
@@ -49,21 +53,17 @@ int bfs( Square destination ,Square start)
       {
        movesQueue.Enqueue(new Square(nx,ny,current.pathlen+1));
 
-      path.Add($"({nx},{ny})",$"({current.x},{current.y})");
+      path.Add(new Square(nx,ny,current.pathlen+1),new Square(current.x,current.y,current.pathlen));
        
        visited.Add($"({nx},{ny})");
       }
-     
-      
     }
-    
-    
    }
 
    return 0;
  }
 
-Square Shorten_path( Square destination )
+ Square Shorten_path( Square destination )
 {
  Square start = new Square(0,0,0);
  while (destination.x -7 > start.x || destination.y -7> start.y)
@@ -72,7 +72,7 @@ Square Shorten_path( Square destination )
   {
    if (destination.x-7-start.x<destination.y-7-start.y)
    {
-    path.Add($"({ start.x +1},{ start.y +2})",$"({start.x},{start.y})");
+    path.Add(new Square(start.x +1, start.y +2,start.pathlen+1),new Square(start.x, start.y ,start.pathlen));
     visited.Add($"({ start.x +1},{ start.y +2})");
     start.x +=1;
     start.y += 2;
@@ -81,7 +81,8 @@ start.pathlen += 1;
    }
    else
    {
-    path.Add($"({ start.x + 2},{ start.y + 1})",$"({start.x},{start.y})");
+   path.Add(new Square(start.x +2, start.y +1,start.pathlen+1),new Square(start.x, start.y ,start.pathlen));
+
     visited.Add($"({ start.x + 2},{ start.y + 1})");
 
     start.x += 2;
@@ -92,7 +93,8 @@ start.pathlen += 1;
 
  else if (destination.x-7 > start.x && destination.y -7<= start.y)
   {
-   path.Add($"({start.x + 2},{start.y - 1})",$"({start.x},{start.y})");
+   path.Add(new Square(start.x +2, start.y -1,start.pathlen+1),new Square(start.x, start.y ,start.pathlen));
+
    visited.Add($"({start.x + 2},{start.y - 1})");
 
    start.x += 2;
@@ -103,7 +105,8 @@ start.pathlen += 1;
   }
   else if (destination.x - 7 <= start.x && destination.y - 7 > start.y)
   {
-   path.Add($"({start.x - 1},{start.y+ 2})",$"({start.x},{start.y})");
+   path.Add(new Square(start.x -1, start.y +2,start.pathlen+1),new Square(start.x, start.y ,start.pathlen));
+
    visited.Add($"({start.x - 1},{start.y+ 2})");
 
    start.x -= 1;
@@ -115,12 +118,14 @@ start.pathlen += 1;
  }
  return start;
 }
-void reconstructPath(string destination)
+void reconstructPath(Square destination)
 {
- string current=destination;
- while (current != "")
+
+ Square current=destination;
+ while (current != null)
  {
-  Console.WriteLine(current);
+  Console.WriteLine($"({current.x},{current.y})");
+  utilities.addTOPath(current);
   current=path[current];
  }
 }
